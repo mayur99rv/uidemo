@@ -5,15 +5,121 @@
     <meta charset="UTF-8" />
   </head>
   <body>
-    <h1>Servies Listed below</h1>
+    <h1>Services</h1>
+    <h2>EMI calculator</h2>
     <hr />
-    <ul>
-      <li>Service A</li>
-      <li>Service B</li>
-      <li>Service C</li>
-      <li>Service D</li>
-    </ul>
+    <form
+      action=""
+      id="myForm"
+      onchange="validateForm()"
+      oninput="validateForm()"
+      onshow="validateForm()"
+    >
+      <div>
+        Appplicant name: <input type="text" name="name" /><br />
+        Type of Loan:
+        <select name="loan" onchange="loanChange()">
+          <option value="none" selected disabled hidden>
+            select an option
+          </option>
+          <option value="home">Home Loan</option>
+          <option value="car">Car Loan</option>
+          <option value="personal">Personal Loan</option></select
+        ><br />
+        Loan Amount: <input type="number" name="amount" min="100000" /><br />
+        Tenure:
+        <select name="tenure" id="years"></select>
+        <br />
+        Rate of Interest : <input type="number" name="roi" disabled />
+        <input
+          type="button"
+          value="Calculate EMI"
+          name="emi"
+          disabled="true"
+          onclick="calcEMI()"
+        />
+
+        <div id="error">
+          <h3>Invalid field messages:</h3>
+        </div>
+      </div>
+    </form>
     <hr />
-    <a href="index.html">Click on link below to go back to Welcome page</a>
+    <a href="welcome.html">Click on link below to go back to welcome page</a>
+
+    <script>
+      function validateForm() {
+        let submit = document.getElementById("myForm")["emi"];
+        let disabled = true;
+        let name = document.forms["myForm"]["name"].value;
+        let loan = document.forms["myForm"]["loan"].value;
+        let amount = document.forms["myForm"]["amount"].value;
+        let error = document.getElementById("error");
+        let initial = "<h3>Invalid field messages:</h3>";
+        let errorMsg = "";
+        if (name.length == 0) {
+          errorMsg += "Name is required<br />";
+          //   errorMsg.append("Name must be filled out \n");
+        }
+        if (loan == "none") {
+          errorMsg += "Loan type must be selected <br />";
+        }
+        if (amount < 100000) {
+          errorMsg += "Loan amount must be greater than Rs.1 lakh <br />";
+        }
+        if (errorMsg.length == 0) {
+          disabled = false;
+          error.innerHTML = errorMsg;
+        } else {
+          error.innerHTML = initial + errorMsg;
+          error.style.color = "red";
+        }
+        if (disabled == false) {
+          submit.disabled = false;
+        } else submit.disabled = true;
+      }
+
+      function loanChange() {
+        var loan = document.getElementsByName("loan")[0].value;
+        let roi = document.getElementsByName("roi")[0];
+        // let tenure = document.getElementsByName("tenure")[0];
+        let tenure = document.getElementById("years");
+        // tenure.innerHTML = "";
+        let maxTenure = 1;
+        if (loan == "home") {
+          roi.value = "7";
+          maxTenure = 25;
+        } else if (loan == "car") {
+          roi.value = "9";
+          maxTenure = 7;
+        } else if (loan == "personal") {
+          roi.value = "12";
+          maxTenure = 5;
+        }
+        for (let i = 1; i <= maxTenure; i++) {
+          let option = document.createElement("option");
+          option.value = i;
+          option.innerHTML = i + " years";
+          tenure.appendChild(option);
+        }
+      }
+      function calcEMI() {
+        let name = document.getElementsByName("name")[0].value;
+        let loan = document.getElementsByName("loan")[0].value;
+        let amount = document.getElementsByName("amount")[0].value;
+        let tenure = document.getElementsByName("tenure")[0].value;
+        let roi = document.getElementsByName("roi")[0].value;
+        roi /= 100.0 * 12.0;
+        let emi =
+          (amount * roi * Math.pow(1 + roi, tenure * 12)) /
+          (Math.pow(1 + roi, tenure * 12) - 1);
+        console.log(tenure, emi);
+        // alert("Hello " + name + "! Your EMI is " + emi);
+        let output = document.getElementById("error");
+        output.innerHTML =
+          "<h2>Hello " + name + "! Your EMI is " + emi + "</h2>";
+        output.style.color = "green";
+      }
+    </script>
   </body>
 </html>
